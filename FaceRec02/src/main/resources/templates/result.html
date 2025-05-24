@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>检测结果</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        .result-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .preview-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .image-preview {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #previewImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .result-details {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .confidence-meter {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            transition: width 0.5s ease;
+        }
+
+        .result-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .real {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .fake {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <h1 style="text-align: center; color: var(--primary-color);">检测结果</h1>
+        
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div th:unless="${error}">
+            <!-- 图片预览和结果分区 -->
+            <div class="preview-section">
+                <!-- 图片预览 -->
+                <div class="image-preview">
+                    <h3>原始图片</h3>
+                    <img id="previewImage" th:src="${imageUrl}" alt="上传图片预览">
+                </div>
+
+                <!-- 检测结果 -->
+                <div class="result-details">
+                    <h3>分析结果</h3>
+                    <div class="result-badge" th:classappend="${result.genuine} ? 'real' : 'fake'"
+                         th:text="${result.genuine} ? '真实人脸 ✅' : '虚假人脸 ❌'">
+                    </div>
+                    
+                    <div class="confidence-meter">
+                        <div class="confidence-fill" th:style="'width: ' + ${result.confidence } + '%;'"></div>
+                    </div>
+
+                    <p style="text-align: center; font-size: 1.1rem;">
+                        置信度：<span th:text="${#numbers.formatDecimal(result.confidence , 1, 2)} + '%'"
+                                    style="color: var(--primary-color); font-weight: bold;"></span>
+                    </p>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <a th:href="@{/recognize}" class="btn back-btn">
+                            重新检测
+                        </a>
+                        <a th:href="@{/explanation}" class="btn explanation-btn" style="margin-left: 1rem;">
+                            查看技术说明
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

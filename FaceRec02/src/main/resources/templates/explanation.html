@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>技术说明 - 大规模数据集实验</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 20px;
+      line-height: 1.6;
+    }
+
+    .tech-card {
+      background: #f8f9fa;
+      border-left: 5px solid var(--secondary-color);
+      padding: 2rem;
+      margin: 2rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .model-arch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .metric-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .highlight {
+      color: var(--secondary-color);
+      font-size: 1.4em;
+      font-weight: bold;
+    }
+
+    .code-snippet {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: Monaco, Consolas, monospace;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+<h1 style="color: var(--primary-color); border-bottom: 3px solid var(--secondary-color); padding-bottom: 0.5rem;">
+  真假人脸检测技术说明
+</h1>
+
+<!-- 模型架构 -->
+<div class="tech-card">
+  <h2>深度神经网络架构</h2>
+  <div class="model-arch">
+    <div>
+      <h3>改进的ResNet-50模型</h3>
+      <ul>
+        <li>基础架构：预训练ResNet-50</li>
+        <li>自定义分类头：
+          <ul>
+            <li>全连接层1：128神经元 + ReLU激活</li>
+            <li>Dropout层：0.4丢弃率</li>
+            <li>输出层：2神经元（真假分类）</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="code-snippet">
+      # 修改全连接层代码
+      model.fc = nn.Sequential(
+      nn.Linear(2048, 128),
+      nn.ReLU(),
+      nn.Dropout(0.4),
+      nn.Linear(128, 2)
+      )
+    </div>
+  </div>
+</div>
+
+<!-- 数据处理 -->
+<div class="tech-card">
+  <h2>数据处理流程</h2>
+  <div class="metric-grid">
+    <div class="metric-box">
+      <div class="highlight">256×256</div>
+      <p>统一图像尺寸</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">±10° 旋转</div>
+      <p>随机数据增强</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">ImageNet归一化</div>
+      <p>均值 [0.485, 0.456, 0.406]<br>标准差 [0.229, 0.224, 0.225]</p>
+    </div>
+  </div>
+</div>
+
+<!-- 训练参数 -->
+<div class="tech-card">
+  <h2>训练配置</h2>
+  <div class="metric-grid">
+    <div class="metric-box">
+      <div class="highlight">20 Epochs</div>
+      <p>训练轮次</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">64</div>
+      <p>批量大小</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">AdamW优化器</div>
+      <p>学习率 1e-4<br>权重衰减 1e-5</p>
+    </div>
+  </div>
+</div>
+
+<!-- 评估结果 -->
+<div class="tech-card">
+  <h2>模型性能表现</h2>
+  <div class="metric-grid">
+    <div class="metric-box">
+      <div class="highlight">90%</div>
+      <p>测试准确率</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">0.90</div>
+      <p>F1分数（真假类别）</p>
+    </div>
+    <div class="metric-box">
+      <div class="highlight">1:1</div>
+      <p>数据平衡比例<br>（7万真脸 vs 7万假脸）</p>
+    </div>
+  </div>
+  <h3 style="margin-top: 2rem;">混淆矩阵表现</h3>
+  <table style="margin: 1rem auto; border-collapse: collapse;">
+    <tr>
+      <th style="padding: 1rem; border: 1px solid #ddd;"></th>
+      <th style="padding: 1rem; border: 1px solid #ddd;">预测真脸</th>
+      <th style="padding: 1rem; border: 1px solid #ddd;">预测假脸</th>
+    </tr>
+    <tr>
+      <td style="padding: 1rem; border: 1px solid #ddd;">实际真脸</td>
+      <td style="padding: 1rem; border: 1px solid #ddd; background: #e8f5e9;">9000</td>
+      <td style="padding: 1rem; border: 1px solid #ddd; background: #ffebee;">1000</td>
+    </tr>
+    <tr>
+      <td style="padding: 1rem; border: 1px solid #ddd;">实际假脸</td>
+      <td style="padding: 1rem; border: 1px solid #ddd; background: #ffebee;">1000</td>
+      <td style="padding: 1rem; border: 1px solid #ddd; background: #e8f5e9;">9000</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 关键技术 -->
+<div class="tech-card">
+  <h2>核心</h2>
+  <div class="metric-grid">
+    <div class="metric-box">
+      <h3>数据增强策略</h3>
+      <ul style="text-align: left;">
+        <li>随机水平翻转 (p=0.5)</li>
+        <li>±10度随机旋转</li>
+        <li>标准化增强泛化能力</li>
+      </ul>
+    </div>
+    <div class="metric-box">
+      <h3>正则化技术</h3>
+      <ul style="text-align: left;">
+        <li>Dropout层 (0.4)</li>
+        <li>权重衰减 (1e-5)</li>
+        <li>早停机制</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center; margin: 3rem 0;">
+  <a href="javascript:history.back()" class="back-btn"
+     style="background: var(--primary-color); color: white; padding: 12px 24px; border-radius: 5px; text-decoration: none;">
+    返回检测结果
+  </a>
+</div>
+</body>
+</html>
